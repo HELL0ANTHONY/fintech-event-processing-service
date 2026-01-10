@@ -7,6 +7,7 @@ import (
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/internal/handler"
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/internal/normalization"
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/internal/processor"
+	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/internal/validation"
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/logger"
 )
 
@@ -14,7 +15,9 @@ func main() {
 	logger.Init()
 
 	n := normalization.New()
-	p := processor.New(n)
+	v := validation.New()
+	p := processor.New(n, v)
+
 	h := handler.New(p)
 
 	lambda.Start(h.Handle)

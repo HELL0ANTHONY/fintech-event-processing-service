@@ -11,19 +11,19 @@ import (
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/logger"
 )
 
-type handler struct {
+type Handler struct {
 	p processor.RequestProcessor
 }
 
 // New creates a new Handler with the given RequestProcessor.
-func New(p processor.RequestProcessor) handler {
-	return handler{
+func New(p processor.RequestProcessor) Handler {
+	return Handler{
 		p: p,
 	}
 }
 
 // Handle is the AWS Lambda handler function.
-func (h handler) Handle(
+func (h Handler) Handle(
 	ctx context.Context,
 	req *events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {

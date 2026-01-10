@@ -58,7 +58,7 @@ func FromAppError(
 		},
 	})
 	if err != nil {
-		slog.Error("failed to marshal error response", "error", err)
+		logger.Error(ctx, "failed to marshal error response", err)
 
 		body = []byte(fallbackErrorJSON)
 	}

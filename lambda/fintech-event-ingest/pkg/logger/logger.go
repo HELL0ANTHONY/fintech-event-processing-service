@@ -12,6 +12,12 @@ import (
 
 type ctxKey struct{}
 
+const (
+	KeyService  = "service"
+	KeyFunction = "fn"
+	KeyError    = "error"
+)
+
 // Init initializes the global logger. Call once in main.
 func Init() {
 	level := slog.LevelInfo
@@ -19,22 +25,30 @@ func Init() {
 		level = slog.LevelDebug
 	}
 
-	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level})
-	base := slog.New(h)
+	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level:     level,
+		AddSource: true,
+		ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
+			return a
+		},
+	})
 
+	base := slog.New(h)
 	if svc := os.Getenv("SERVICE_NAME"); svc != "" {
-		base = base.With(slog.String("service", svc))
+		base = base.With(slog.String(KeyService, svc))
 	}
 
 	slog.SetDefault(base)
 	log.SetFlags(0)
-	log.SetOutput(&writer{})
+	log.SetOutput(&writer{base})
 }
 
-type writer struct{}
+type writer struct {
+	logger *slog.Logger
+}
 
 func (w *writer) Write(p []byte) (int, error) {
-	slog.Info(strings.TrimSuffix(string(p), "\n"))
+	w.logger.Info(strings.TrimSuffix(string(p), "\n"))
 	return len(p), nil
 }
 
@@ -53,7 +67,6 @@ func from(ctx context.Context) *slog.Logger {
 
 func caller() string {
 	pc, _, _, ok := runtime.Caller(2)
-
 	if !ok {
 		return "unknown"
 	}
@@ -69,27 +82,27 @@ func caller() string {
 
 // Info logs at INFO level with automatic caller detection.
 func Info(ctx context.Context, msg string, args ...any) {
-	from(ctx).Info(msg, append(args, slog.String("fn", caller()))...)
+	from(ctx).InfoContext(ctx, msg, append(args, slog.String(KeyFunction, caller()))...)
 }
 
 // Error logs at ERROR level with automatic caller detection.
 func Error(ctx context.Context, msg string, err error, args ...any) {
 	from(
 		ctx,
-	).Error(msg, append(args, slog.String("fn", caller()), slog.String("error", err.Error()))...)
+	).ErrorContext(ctx, msg, append(args, slog.String(KeyFunction, caller()), slog.String(KeyError, err.Error()))...)
 }
 
 // Debug logs at DEBUG level with automatic caller detection.
 func Debug(ctx context.Context, msg string, args ...any) {
-	from(ctx).Debug(msg, append(args, slog.String("fn", caller()))...)
+	from(ctx).DebugContext(ctx, msg, append(args, slog.String(KeyFunction, caller()))...)
 }
 
 // Warn logs at WARN level with automatic caller detection.
 func Warn(ctx context.Context, msg string, args ...any) {
-	from(ctx).Warn(msg, append(args, slog.String("fn", caller()))...)
+	from(ctx).WarnContext(ctx, msg, append(args, slog.String(KeyFunction, caller()))...)
 }
 
 // ErrorAttrs logs at ERROR level with automatic caller detection and additional attributes.
 func ErrorAttrs(ctx context.Context, msg string, args ...any) {
-	from(ctx).Error(msg, append(args, slog.String("fn", caller()))...)
+	from(ctx).ErrorContext(ctx, msg, append(args, slog.String(KeyFunction, caller()))...)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/internal/normalization"
+	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/internal/validation"
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/constants"
 	customerrors "github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/errors"
 	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/httpx"
@@ -27,12 +28,14 @@ type RequestProcessor interface {
 // Processor implements the RequestProcessor interface.
 type Processor struct {
 	n normalization.Normalizable
+	v validation.Validatable
 }
 
 // New creates a new RequestProcessor implementation.
-func New(n normalization.Normalizable) RequestProcessor {
+func New(n normalization.Normalizable, v validation.Validatable) RequestProcessor {
 	return &Processor{
 		n: n,
+		v: v,
 	}
 }
 
@@ -55,6 +58,12 @@ func (p *Processor) Process(
 		"normalized request",
 		slog.Any("payload", normalizedRequest),
 	)
+
+	if err := p.v.ValidateSchema(normalizedRequest); err != nil {
+		appErr := customerrors.Validation(err)
+
+		return httpx.FromAppError(ctx, req, appErr), nil
+	}
 
 	logger.Info(
 		ctx,

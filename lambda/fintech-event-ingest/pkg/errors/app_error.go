@@ -40,6 +40,7 @@ func DuplicateEvent() *AppError {
 		Code:       constants.ErrorDuplicateEvent,
 		Retryable:  false,
 		HTTPStatus: http.StatusConflict,
+		Cause:      nil,
 	}
 }
 

@@ -16,16 +16,16 @@ type Amount struct {
 type Event struct {
 	Metadata   map[string]any `json:"metadata"`
 	Amount     Amount         `json:"amount"`
-	EventID    string         `json:"eventId"`
+	EventID    string         `json:"event_id"`
 	Type       string         `json:"type"`
-	OccurredAt string         `json:"occurredAt"`
-	AccountID  string         `json:"accountId"`
+	OccurredAt string         `json:"occurred_at"`
+	AccountID  string         `json:"account_id"`
 }
 
 // Request represents an incoming request containing a fintech event.
 type Request struct {
 	Source  string  `json:"source,omitempty"`
-	BatchID string  `json:"batchId"`
+	BatchID string  `json:"batch_id"`
 	Event   []Event `json:"event"`
 }
 
