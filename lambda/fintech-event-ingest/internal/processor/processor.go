@@ -53,12 +53,14 @@ func (p *Processor) Process(
 
 	normalizedRequest := p.n.Normalize(transactions)
 
+	// NOTE: No imprimir datos demasiado grandes en logs reales.
 	logger.Debug(
 		ctx,
 		"normalized request",
 		slog.Any("payload", normalizedRequest),
 	)
 
+	// NOTE: Valida los schemas y luego se guardan en la base de datos con el status RECEIVED.
 	if err := p.v.ValidateSchema(normalizedRequest); err != nil {
 		appErr := customerrors.Validation(err)
 

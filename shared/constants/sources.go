@@ -3,7 +3,6 @@ package constants
 // Source represents the origin of the event ingestion request.
 type Source string
 
-// Represents the different valid sources for event ingestion.
 const (
 	SourceAPI         Source = "api"
 	SourceBatch       Source = "batch"
@@ -12,9 +11,9 @@ const (
 	SourceTest        Source = "test"
 )
 
-// IsValidSource checks if the provided source is a valid Source.
-func IsValidSource(source Source) bool {
-	switch source {
+// IsValidSource checks if the provided source is valid.
+func IsValidSource(s Source) bool {
+	switch s {
 	case SourceAPI, SourceBatch, SourceEventBridge, SourceReplay, SourceTest:
 		return true
 	default:
