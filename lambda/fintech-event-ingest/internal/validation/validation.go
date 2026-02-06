@@ -1,20 +1,17 @@
-// Package validation provides interfaces and implementations for validating request schemas and business rules.
 package validation
 
 import (
-	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/models"
+	"github.com/HELL0ANTHONY/fintech-event-processing-service/shared/models"
 )
 
-// Validatable defines the contract for validating request schemas.
-type Validatable interface {
-	ValidateSchema(data *models.Request) error
-	ValidateBusinessRules(data *models.Request) error
+// SchemaValidator validates events against the expected schema.
+type SchemaValidator interface {
+	ValidateSchema(event *models.Event) error
 }
 
-// Validator implements the Validatable interface.
-type Validator struct{}
+type validator struct{}
 
-// New creates a new instance of Validator.
-func New() Validatable {
-	return &Validator{}
+// New creates a new SchemaValidator.
+func New() SchemaValidator {
+	return &validator{}
 }

@@ -39,9 +39,9 @@ const (
 
 // Config holds logger configuration.
 type Config struct {
+	Output      io.Writer
 	ServiceName string
 	Level       slog.Level
-	Output      io.Writer
 	AddSource   bool
 }
 
@@ -144,8 +144,6 @@ func Warn(ctx context.Context, msg string, args ...any) {
 	From(ctx).WarnContext(ctx, msg, append(args, slog.String(KeyFunction, caller()))...)
 }
 
-// --- Observability-focused logging methods ---
-
 // EventReceived logs when an event is received.
 func EventReceived(ctx context.Context, eventID, eventType, accountID, batchID string) {
 	Info(ctx, "event_received",
@@ -213,6 +211,7 @@ func BatchCompleted(ctx context.Context, batchID string, processed, failed int, 
 //	defer done()
 func OperationStart(ctx context.Context, operation string) func() {
 	start := time.Now()
+
 	Debug(ctx, "operation_start", slog.String("operation", operation))
 
 	return func() {

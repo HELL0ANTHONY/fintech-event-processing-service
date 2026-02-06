@@ -1,27 +1,24 @@
-// Package normalization provides interfaces and implementations for data normalization.
 package normalization
 
 import (
+	"github.com/HELL0ANTHONY/fintech-event-processing-service/shared/models"
 	"github.com/google/uuid"
-
-	"github.com/HELL0ANTHONY/fintech-event-processing-service/lambda/fintech-event-ingest/pkg/models"
 )
 
-// Normalizable defines the contract for normalizing data.
-type Normalizable interface {
+// Normalizer fills default values for requests.
+type Normalizer interface {
 	Normalize(req *models.Request) *models.Request
 }
 
-// Normalizer implements the Normalizable interface.
-type Normalizer struct{}
+type normalizer struct{}
 
-// New creates a new instance of Normalizer.
-func New() Normalizable {
-	return &Normalizer{}
+// New creates a new Normalizer.
+func New() Normalizer {
+	return &normalizer{}
 }
 
-// Normalize processes the input request and ensures required fields are set.
-func (n *Normalizer) Normalize(req *models.Request) *models.Request {
+// Normalize fills default values for source and batch ID.
+func (n *normalizer) Normalize(req *models.Request) *models.Request {
 	if req.Source == "" {
 		req.Source = "api"
 	}
