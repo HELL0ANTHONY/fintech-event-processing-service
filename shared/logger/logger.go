@@ -63,8 +63,9 @@ func DefaultConfig() Config {
 // Init initializes the global logger with the given configuration.
 func Init(cfg Config) {
 	h := slog.NewJSONHandler(cfg.Output, &slog.HandlerOptions{
-		Level:     cfg.Level,
-		AddSource: cfg.AddSource,
+		Level:       cfg.Level,
+		AddSource:   cfg.AddSource,
+		ReplaceAttr: nil,
 	})
 
 	base := slog.New(h)
